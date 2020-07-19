@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  bento:
+    image: ${REGISTRY}/bento:${BENTO_VERSION}dev
+    environment:
+      DEV: "True"
+      LOGLEVEL_NAME: "10"
+    volumes:
+      - ${HOME}/${PYREPO}/:${PYTHON_SP}/
+    # Override the gunicorn default command
+    command: ["python3", "-m", "bento.develop"]
