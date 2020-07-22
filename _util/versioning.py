@@ -1,6 +1,6 @@
 import re
 
-from common import logger
+from _util import logger
 
 logging = logger.fancy_logger(__name__)
 

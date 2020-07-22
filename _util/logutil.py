@@ -3,7 +3,7 @@ import functools
 import inspect
 import os
 import traceback
-from common import logger
+from _util import logger
 
 # logging = logger.fancy_logger(__name__)
 # We want to use a simple format here because we care about the wrapped function

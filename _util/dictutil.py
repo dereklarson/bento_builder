@@ -1,7 +1,7 @@
 import re
 
-from common import logutil  # noqa
-from common.logger import fancy_logger
+from _util import logutil  # noqa
+from _util.logger import fancy_logger
 
 logging = fancy_logger(__name__)
 

@@ -1,11 +1,20 @@
-version: "3.7"
+version: '3.7'
 services:
   bento:
-    image: ${REGISTRY}/bento:${BENTO_VERSION}dev
+    image: ${REGISTRY}/${APP}:${APP_VERSION}dev
+    env_file:
+    - .env
     environment:
-      DEV: "True"
-      LOGLEVEL_NAME: "10"
+      APP: ${APP}
+      APP_HOME: /app
+      DEV: 'True'
+      LOGLEVEL_NAME: '10'
     volumes:
-      - ${HOME}/${PYREPO}/:${PYTHON_SP}/
-    # Override the gunicorn default command
-    command: ["python3", "-m", "bento.develop"]
+    - ${HOME}/${VOLUMES}/data/:/app/${DATA_DIR}/
+    - ${HOME}/${BENTOREPO}/bento/:${PYTHON_SP}/bento/
+    ports:
+    - ${BENTO_PORT}:${BENTO_PORT}
+    command:
+    - python3
+    - -m
+    - entrypoint

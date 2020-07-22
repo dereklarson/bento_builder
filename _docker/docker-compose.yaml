@@ -9,6 +9,5 @@ services:
       APP_HOME: /app
     volumes:
       - ${HOME}/${VOLUMES}/data/:/app/${DATA_DIR}/
-      - ${HOME}/${VOLUMES}/storage/:/app/${STORAGE_DIR}/
     ports:
       - "${BENTO_PORT}:${BENTO_PORT}"

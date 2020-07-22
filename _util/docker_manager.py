@@ -7,8 +7,8 @@ import tqdm
 import parse
 from jinja2 import Environment, PackageLoader
 
-from common import logger, logutil
-from common.structure import ENV
+from _util import logger, logutil
+from _util.structure import ENV
 
 logging = logger.fancy_logger("docker")
 

@@ -7,8 +7,8 @@ import os
 import re
 from dataclasses import dataclass
 
-from common import logger
-from common.dictutil import Edict  # Allows set "&" syntax on dict keys
+from _util import logger
+from _util.dictutil import Edict  # Allows set "&" syntax on dict keys
 
 logging = logger.fancy_logger(__name__)
 

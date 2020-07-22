@@ -20,10 +20,5 @@ bento_flask = app.server
 
 # When not deploying on the web, you can run the entrypoint without Gunicorn
 if __name__ == "__main__":
-    try:
-        if ENV.DEV:
-            app.run(port=ENV.BENTO_PORT, debug=True)
-        else:
-            app.run(host="0.0.0.0", port=ENV.BENTO_PORT, debug=False)
-    except (KeyboardInterrupt, SystemExit):
-        logging.info("Exiting...")
+    logging.info("Running development server with hot-reload")
+    app.run_server(host="0.0.0.0", port=ENV.BENTO_PORT, debug=True)
