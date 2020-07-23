@@ -1,7 +1,7 @@
 # Bento Builder
 
 [![GitHub](https://img.shields.io/github/license/dereklarson/bento_builder?style=for-the-badge)](https://github.com/dereklarson/bento_builder/blob/master/LICENSE)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/dereklarson/bento_builder?style=for-the-badge)](https://github.com/dereklarson/bento_builder/graphs/contributors)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/dereklarson/bento_builder?style=for-the-badge)](https://github.com/dereklarson/bento_builder/graphs/contributors)
 
 ### *A workspace for running and Dockerizing [Bento](https://github.com/dereklarson/bento)*
 
