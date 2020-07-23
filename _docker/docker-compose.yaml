@@ -8,6 +8,6 @@ services:
       APP: ${APP}
       APP_HOME: /app
     volumes:
-      - ${HOME}/${VOLUMES}/data/:/app/${DATA_DIR}/
+      - ${HOME}/${VOLUMES}/${DATA_DIR}/:/app/${DATA_DIR}/
     ports:
       - "${BENTO_PORT}:${BENTO_PORT}"

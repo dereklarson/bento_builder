@@ -6,7 +6,8 @@ services:
       DEV: "True"
       LOGLEVEL_NAME: "10"
     volumes:
-      - ${HOME}/${BENTOREPO}/bento/:${PYTHON_SP}/bento/
+      - ${HOME}/${BUILDER_REPO}/${APP}/:/app/${APP}/
+      # You may find it useful to mount and edit the Bento codebase
+      # - ${HOME}/${BENTOREPO}/bento/:${PYTHON_SP}/bento/
     # Override the gunicorn default command
-    # command: ["python3", "-m", "bento.develop"]
     command: ["python3", "-m", "entrypoint"]

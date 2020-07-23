@@ -6,9 +6,9 @@ import pathlib
 import pickle
 import pandas as pd
 
-from _util import logger
-from _util.environment import ENV
+from _util import logger, environment
 
+ENV = environment.init("ENV")
 logging = logger.fancy_logger(__name__)
 
 

@@ -170,10 +170,3 @@ descriptor = {
         "data": data_page,
     },
 }
-
-
-if __name__ == "__main__":
-    from bento import bento
-
-    app_def = bento.Bento(descriptor)
-    app_def.write("cache/shared/active/generated.py")

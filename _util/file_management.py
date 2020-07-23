@@ -51,7 +51,7 @@ def create(path):
 
 
 def recreate(path):
-    remove(path)
+    remove(path, ignorable=True)
     create(path)
 
 

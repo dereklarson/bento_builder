@@ -1,0 +1,22 @@
+## --- Universal Environment Variables ---
+## Docker image registry:  e.g. Google cloud platform => gcr.io/<project>
+## Use "local" if you don't plan to push to a cloud provider
+REGISTRY=local
+BENTO_PORT=7777
+
+## Location within the local $HOME of your data directory
+## This is mounted into the Docker container, see _docker/docker-compose.yaml
+## E.g. ${HOME}/${VOLUMES}/${DATA_DIR} should contain the folders containing your data
+VOLUMES=dev/work/volumes
+DATA_DIR=data
+
+## Mounting your Bento descriptor and data loading lets you develop live in the container
+BUILDER_REPO=dev/work/repositories/bento_builder/
+
+## --- Env injected into runtime (local or container)
+## Location of GIT repositories feeding source into the projects
+# BENTOREPO=dev/work/repositories/bento
+
+## Where you will mount Python code inside a Docker container
+## This enables hot-reloading of the Bento codebase
+# PYTHON_SP=/usr/local/lib/python3.8/site-packages/

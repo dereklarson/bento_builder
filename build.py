@@ -6,10 +6,9 @@ import os
 import subprocess
 import sys
 
-from _util import versioning
+from _util import versioning, environment
 from _util import file_management as FM
 from _util.docker_manager import DockerManager
-
 
 try:
     from _util import logger
@@ -18,13 +17,11 @@ try:
 except ImportError:
     import logging
 
-LOCAL_ENV = "../ORG_ENV"
-
 
 def run_command(cmd):
     proc = subprocess.Popen(cmd)
     try:
-        logging.info(f"Waiting on {cmd[0]}")
+        logging.info(f"Running {' '.join(cmd)}")
         logging.debug(cmd)
         proc.wait()
     except KeyboardInterrupt:
@@ -40,7 +37,7 @@ def tag(build_args):
         version = versioning.get_version(build_args.app)
     build_args.version = version
     state = "" if not build_args.dev else "dev"
-    build_args.tag = f"{os.environ['REGISTRY']}/{build_args.app}:{version}{state}"
+    build_args.tag = f"{build_args.env.REGISTRY}/{build_args.app}:{version}{state}"
     logging.info(f"Setting build tag to {build_args.tag}")
 
 
@@ -51,18 +48,8 @@ def prepare_stage(build_args):
     FM.copy(f"{build_args.app}", f"{build_args.stg_dir}/{build_args.app}")
 
 
-def prepare_entrypoint(build_args):
-    dest = f"{build_args.stg_dir}/entrypoint.py"
-    source = f"{build_args.entrypoint}.py"
-    if not glob.glob(source):
-        logging.info("Entrypoint file not found, presuming to ignore")
-        return
-    logging.debug(f"Preparing entrypoint {source} => {dest}")
-    FM.copy(source, dest)
-
-
 def add_docker(build_args):
-    logging.debug(f"Adding {build_args.app} docker materials => {build_args.stg_dir}")
+    logging.debug(f"Adding docker materials: _docker/* => {build_args.stg_dir}")
     FM.copy("_docker/*", build_args.stg_dir)
     compose = f"{build_args.stg_dir}/docker-compose.yaml"
     dev_compose = f"{build_args.stg_dir}/dev-docker-compose.yaml"
@@ -78,10 +65,9 @@ def add_docker(build_args):
 
 def env_file(build_args):
     """Creates the env file for use with docker-compose"""
-    logging.debug(f"..._docker/.* => .env for docker compose support")
-    in_files = [inf for inf in sorted(glob.glob("_docker/.*")) if "swp" not in inf]
-    in_files.append(LOCAL_ENV)
-    logging.debug(f"    from {in_files}")
+    logging.debug(f"ENV* => .env, providing docker compose vars")
+    in_files = [inf for inf in sorted(glob.glob("ENV*"))]
+    logging.debug(f"    files found: {', '.join(in_files)}")
     with open(f"{build_args.stg_dir}/.env", "w") as fout:
         loglevel = 10 if build_args.verbose else 20
         fout.write(f"# Logging for modules\nLOGLEVEL_NAME={loglevel}\n\n")
@@ -92,18 +78,30 @@ def env_file(build_args):
         )
         with fileinput.input(in_files) as fin:
             for line in fin:
+                if line.startswith("#"):
+                    continue
+                elif "<" in line and ">" in line:
+                    logging.warning(f"Uninitialized ENV: {line.strip()}")
+                    logging.warning("(Edit the ENV file to match your local config)")
                 fout.write(line)
 
 
-def _prepare_run(build_args):
-    os.environ["BARE"] = "True"
-    os.chdir(build_args.stg_dir)
-    sys.path.append(f"{os.environ['PYREPO']}/{build_args.stg_dir}")
+def prepare_entrypoint(build_args):
+    dest = f"{build_args.stg_dir}/entrypoint.py"
+    source = f"{build_args.entrypoint}.py"
+    if not glob.glob(source):
+        logging.info("Entrypoint file not found, presuming to ignore")
+        return
+    FM.copy(source, dest)
+    logging.debug(f"Entrypoint: {dest}")
 
 
 def execute(build_args):
-    _prepare_run(build_args)
-    subprocess.run(["python3", "launch_app.py"])
+    os.environ["APP"] = build_args.app
+    os.chdir(build_args.stg_dir)
+    sys.path.append(f"{os.environ['BUILDER_REPO']}/{build_args.stg_dir}")
+    # subprocess.run(["python3", f"{build_args.entrypoint}.py"])
+    run_command(["python3", f"{build_args.entrypoint}.py"])
     finish(None)
 
 
@@ -159,7 +157,7 @@ if __name__ == "__main__":
         default="entrypoint",
         help=f"Choose entrypoint (entrypoint)",
     )
-    parser.add_argument("-B", "--build", action="store_false", help="Avoid build")
+    parser.add_argument("-b", "--build", action="store_true", help="Build docker image")
     parser.add_argument("-d", "--dev", action="store_true", help="Dev build")
     parser.add_argument(
         "-i", "--interact", action="store_true", help="Enter docker image"
@@ -167,7 +165,6 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--push", action="store_true", help="Push image online")
     parser.add_argument("-q", "--quiet", action="store_true", help="No info output")
     parser.add_argument("-r", "--release", nargs="?", default="", help=f"Release (app)")
-    parser.add_argument("-s", "--stage", action="store_true", help="Only prepare build")
     parser.add_argument("-t", "--tag", nargs="?", default="", help="Docker image tag")
     parser.add_argument("-u", "--up", action="store_true", help="Run after build")
     parser.add_argument("-v", "--verbose", action="store_true", help="Debugging output")
@@ -177,10 +174,14 @@ if __name__ == "__main__":
     # NOTE This has issues with timing of imports. We probably need to add some more
     # clever way to adjust the logging levels of local modueles
     if args.quiet:
+        os.environ["LOGLEVEL"] = "30"
         logging.setLevel(30)
 
     if args.verbose:
+        os.environ["LOGLEVEL"] = "10"
         logging.setLevel(10)
+
+    args.env = environment.init("ENV")
 
     # Point staging directory to app-specific directory
     args.stg_dir = f"{args.build_dir}/{args.app}"
@@ -196,7 +197,6 @@ if __name__ == "__main__":
         env_file,
         prepare_entrypoint,
         execute if args.execute else None,
-        finish if args.stage else None,
         build if args.build else None,
         push if args.push else None,
         enter if args.interact else None,

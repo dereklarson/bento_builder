@@ -15,34 +15,32 @@ logging = logger.fancy_logger(__name__)
 
 @dataclass
 class ENV_SPEC:
-    # Generic
-    DEV: bool = False
-    HOME: str = "."
+    # Generic variables
     APP: str = ""
-    APP_HOME: str = "."
+    DEV: bool = False
 
-    # Organization configuration
-    REGISTRY: str = ""
+    # Determines where the application looks for resources
+    APP_HOME: str = "."
+    DATA_DIR: str = "data"
     STORAGE_DIR: str = "storage"
     BUILD_DIR: str = "build"
 
-    # Python generic variables
-    ASSETS_DIR: str = "assets"
-    DATA_DIR: str = "data"
+    # Where in your local environment to look for resources
+    # (Usually, this is just provided by your usual $HOME)
+    HOME: str = "."
 
-    DOCKER_PREFIX: str = "bento__"
-
-    # Bento specific variables
+    # Organization configuration: Cloud computing, etc
+    REGISTRY: str = "local"
     BENTO_PORT: int = 7777
-    BENTO_DESCRIPTOR: str = "bento.demo_descriptor"
 
 
 def parse_env_file(env_file: str) -> dict:
     """When not running in a container, the env_file won't be injected, so we need to
     process the environemnt variables manually using this function"""
-    logging.debug("Adding environment variables:")
     with open(env_file, "r") as fh:
         for line in fh:
+            if line.startswith("#"):
+                continue
             match = re.search(r"([A-Z_]+)=(.*)", line)
             try:
                 name, val = match.groups()
@@ -52,13 +50,12 @@ def parse_env_file(env_file: str) -> dict:
                 pass
 
 
-# TODO Enhance once structure is finished
-# Loads any env files into the enviroment
-try:
-    parse_env_file("../ORG_ENV")
-except Exception:
-    pass
-
-ENV = ENV_SPEC(**(Edict(os.environ) & Edict(ENV_SPEC())))
-logging.debug("---Environment variables:")
-logging.debug(vars(ENV))
+def init(env_file: str):
+    # First load input env files into the
+    parse_env_file(env_file)
+    ENV = ENV_SPEC(**(Edict(os.environ) & Edict(ENV_SPEC())))
+    # TODO Figure this out (order of ops problems with importing, logging, env-setting)
+    # logging.setLevel(int(os.environ["LOGLEVEL"]))
+    logging.debug("---Environment variables:")
+    logging.debug(vars(ENV))
+    return ENV
