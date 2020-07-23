@@ -8,6 +8,7 @@ services:
       APP: ${APP}
       APP_HOME: /app
     volumes:
-      - ${HOME}/${VOLUMES}/${DATA_DIR}/:/app/${DATA_DIR}/
+      # When you have data to mount, uncomment this and double-check your ENV file
+      # - ${HOME}/${VOLUMES}/${DATA_DIR}/:/app/${DATA_DIR}/
     ports:
       - "${BENTO_PORT}:${BENTO_PORT}"

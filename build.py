@@ -74,7 +74,8 @@ def env_file(build_args):
         fout.write(
             "# Application Specs\n"
             f"APP={build_args.app}\n"
-            f"APP_VERSION={build_args.version}\n\n"
+            f"APP_VERSION={build_args.version}\n"
+            f"BUILDER_REPO={os.getcwd()}\n\n"
         )
         with fileinput.input(in_files) as fin:
             for line in fin:
@@ -99,8 +100,6 @@ def prepare_entrypoint(build_args):
 def execute(build_args):
     os.environ["APP"] = build_args.app
     os.chdir(build_args.stg_dir)
-    sys.path.append(f"{os.environ['BUILDER_REPO']}/{build_args.stg_dir}")
-    # subprocess.run(["python3", f"{build_args.entrypoint}.py"])
     run_command(["python3", f"{build_args.entrypoint}.py"])
     finish(None)
 
