@@ -10,7 +10,7 @@ map_page = {
             "args": {"category": "map", "variant": "choropleth", "geo": "states"},
         },
     },
-    "layout": [["axes", "filters"], ["statemap"]],
+    "layout": [["axes"], ["statemap"]],
     "connections": {"axes": {"statemap"}},
 }
 

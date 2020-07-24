@@ -10,11 +10,6 @@ BENTO_PORT=7777
 # VOLUMES=<path/from/HOME/to/data/parent>
 # DATA_DIR=data
 
-## To develop live, you can mount your Bento project into a container
-## Uncomment the following and point it to your bento_builder (or fork) folder 
-## See _docker/dev-docker-compose.yaml for where it is used.
-# BUILDER_REPO=<path/to/bento_builder>
-
 ## A more advanced user might want to live edit the Bento codebase
 ## You will need the following two variables. See _docker/dev-docker-compose.yaml
 # BENTO_REPO=<path/to/bento>

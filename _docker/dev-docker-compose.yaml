@@ -6,6 +6,7 @@ services:
       DEV: "True"
       LOGLEVEL_NAME: "10"
     volumes:
+      # To develop with hot-reload, this mounts your Bento project into a container
       - ${BUILDER_REPO}/${APP}/:/app/${APP}/
       # You may find it useful to mount and edit the Bento codebase
       # - ${HOME}/${BENTO_REPO}/bento/:${PYTHON_SP}/bento/
