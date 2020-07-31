@@ -1,9 +1,10 @@
 map_page = {
-    "dataid": "housing",
+    "dataid": "zillow_2020",
     "banks": {
         "axes": {
             "type": "axis_controls",
-            "args": {"use": "z", "default": "Zillow Rent Index"},
+            "width": 3,
+            "args": {"use": "z", "default": "Zillow Rent Index", "scale": False},
         },
         "statemap": {
             "type": "graph",
@@ -16,8 +17,8 @@ map_page = {
 
 descriptor = {
     "name": "simple",
-    "theme": "dark",
+    "theme": "dark sparse flat",
     "appbar": {"title": "US Housing Market", "subtitle": "Data from Zillow in 2020",},
-    "data": {"housing": {"module": "housing.df_housing"}},
+    "data": {"zillow_2020": {"module": "housing.df_snapshot"},},
     "pages": {"map": map_page},
 }

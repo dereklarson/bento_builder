@@ -14,21 +14,25 @@ This workspace will help you:
 ## Quickstart
 Dependencies: Python 3.7+ and [Bento](https://github.com/dereklarson/bento)
 
+You will also want [Docker installed](https://docs.docker.com/get-docker/)
+to get the most out of this repository.
+
 ##### Clone this repo:
 `git clone https://github.com/dereklarson/bento_builder.git`
 
-##### Try generating the simplest example:
-`./build.py simple_example`
-
-You should see `bento_app.py` in `_build/simple_example`
-
-##### Locally run the simple example dashboard:
+##### Try locally serving the simple example dashboard:
 `./build.py simple_example -x` (using the -x "execute" flag)
 
-The dashboard should be up at `localhost:7777` in your browser
+*After some log output, the dashboard should be up at `localhost:7777` in your browser.*
 
-##### Try building a Docker image and running a container:
+This is useful if you're not familiar with Docker yet, or want to determine whether
+a bug is dependent on the Docker environment.
+
+##### Also try building a Docker image and running a container:
 `./build.py simple_example -bu` (using the -b "build" and -u "up" flags)
+
+In this case the dataset is included in the build (it's small), so you could now
+use this image in a deployment.
 
 ##### Test editing with hot-reload, it's recommended to use Docker: 
 `./build.py simple_example -dbu` (includes the -d "dev" flag)
@@ -41,6 +45,6 @@ will cause the Flask server to regenerate the Bento app and reflect your changes
 
 To initiate your own dashboard, I recommend the following steps:
 * Create a new directory with your app name
-* Copy `simple_example/descriptor.py` to the new directory
-* Prepare code that can load a dataframe for Bento (see `covid_full/df_covid_us.py`)
-* Connect your dataset to your Bento app
+* Copy `housing/descriptor.py` to the new directory
+* Prepare code that can load a dataframe for Bento (see `housing/df_snapshot.py`)
+* Connect your dataset to your Bento app by modifying `descriptor.py`
