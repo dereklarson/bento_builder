@@ -27,11 +27,11 @@ def run_command(cmd):
     except KeyboardInterrupt:
         logging.info(f"Letting {cmd[0]} clean up...")
         proc.wait()
-        logging.info("...Done")
+        logging.info("Done")
 
 
 def tag(build_args):
-    if build_args.release:
+    if build_args.release in ("major", "minor", "patch", "revert"):
         version = versioning.release(build_args.app, level=build_args.release)
     else:
         version = versioning.get_version(build_args.app)

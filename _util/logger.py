@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import os
 import sys
@@ -71,6 +72,8 @@ class FancyFormatter(logging.Formatter):
     """Adds colors and structure to a log output"""
 
     def __init__(self, schema="default", fmt=None, level_color=None):
+        super().__init__()
+
         # The schema will have level-dependent format strings
         self.schema = schemas.get(schema, schemas["default"])
 
@@ -106,7 +109,13 @@ class FancyFormatter(logging.Formatter):
 
         # Prepare a pretty version of the message
         curr_conf = config.get(record.levelname, config["default"])
-        pretty = pprint.pformat(record_dict["msg"]).strip("'\"")
+
+        if isinstance(record_dict["msg"], (dict, list, tuple)):
+            pretty = pprint.pformat(record_dict["msg"]).strip("'\"")
+        elif dataclasses.is_dataclass(record_dict["msg"]):
+            pretty = pprint.pformat(record_dict["msg"])
+        else:
+            pretty = str(record_dict["msg"])
         total_lines = pretty.count("\n")
         if total_lines > curr_conf["max_lines"]:
             lines = pretty.splitlines()
@@ -116,21 +125,27 @@ class FancyFormatter(logging.Formatter):
         record_dict["level_str"] = self.level_fmt(record.levelname)
         record_dict["msg"] = pretty
 
-        # Shortcut characters for adding extra color
+        # --- Logging macros for doing some special operations ---
+        # Uses purple to draw extra attention to the text of the line
         if record_dict["msg"].startswith("#!"):
             record_dict["msg"] = (
                 self.color_text(record_dict["msg"][2:], "purple") + "\n"
             )
-            message = formats[style].format(**record_dict)
+        # Doesn't add a newline, allowing line continuation
         elif record_dict["msg"].startswith("#^"):
             record_dict["msg"] = record_dict["msg"][2:]
-            message = formats[style].format(**record_dict)
-        elif record_dict["msg"].startswith("#$"):
-            record_dict["msg"] = self.color_text(record_dict["msg"][2:], "green") + "\n"
-            message = formats["msg"].format(**record_dict)
+        # Next two Continue previous line by using a logformat with message text only
+        # First with green, indicating a desirable result
+        elif record_dict["msg"].startswith("#$+"):
+            record_dict["msg"] = self.color_text(record_dict["msg"][3:], "green") + "\n"
+            style = "msg"
+        # Seconde with red, indicating a problem
+        elif record_dict["msg"].startswith("#$-"):
+            record_dict["msg"] = self.color_text(record_dict["msg"][3:], "red") + "\n"
+            style = "msg"
         else:
             record_dict["msg"] += "\n"
-            message = formats[style].format(**record_dict)
+        message = formats[style].format(**record_dict)
         return message
 
 
@@ -151,16 +166,24 @@ def fancy_logger(name, fmt=None, level=None):
 
 
 if __name__ == "__main__":
-    nl = fancy_logger("test")
+    fl = fancy_logger("test")
     for level in ["debug", "info", "warning", "error"]:
-        getattr(nl, level)(f"This is a {level} test")
-    nl.info("%Purple message")
-    nl.info(
+        getattr(fl, level)(f"This is a {level} test")
+
+    fl.info("Multi\nLine\nMessage")
+    # Test the Macros: continuation, color
+    fl.info("#^Continuation...")
+    fl.info("#$+ pass")
+    fl.info("#^Continuation...")
+    fl.info("#$- fail")
+    fl.info("#!Purple message")
+
+    # Test other datatypes
+    fl.info(
         {
             "title": "This is a pretty dictionary",
             "reasons": ["indentation", "length-checking"],
-            "strings": [str(i) * 8 for i in range(8)],
-            # "codes": [str(i) * 8 for i in range(50)],
+            "strings": [str(i) * 8 for i in range(15)],
         }
     )
 
@@ -182,6 +205,6 @@ if __name__ == "__main__":
             "PIP3 flask GitPython gcp resumable-media",
         ]
 
-        nl.warning(Build(command="1", orders=orders))
+        fl.warning(Build(command="1", orders=orders))
     except ImportError:
         pass
