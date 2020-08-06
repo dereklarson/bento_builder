@@ -4,7 +4,7 @@ map_page = {
         "axes": {
             "type": "axis_controls",
             "width": 3,
-            "args": {"use": "z", "default": "Zillow Rent Index", "scale": False},
+            "args": {"use": "z", "z.default": "Zillow Rent Index", "scale": False},
         },
         "statemap": {
             "type": "graph",
