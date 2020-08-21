@@ -1,10 +1,39 @@
 import glob
 import importlib
+import os
 import sys
 
 from _util import logger
 
 logging = logger.fancy_logger(__name__)
+
+
+def test_app_names() -> bool:
+    """Checks if the user-defined app name is already an importable Python module"""
+    cwd = os.getcwd()
+    while "" in sys.path:
+        sys.path.remove("")
+    while cwd in sys.path:
+        sys.path.remove(cwd)
+
+    for app in [appdir[:-1] for appdir in glob.glob("[a-z]*/")]:
+        try:
+            importlib.import_module(f"{app}")
+            logging.warning(
+                f"Name '{app}' intersects with a Python module, try a new one"
+            )
+            flag = True
+        except ModuleNotFoundError:
+            flag = False
+        except Exception:
+            logging.info(f"Module {app} found but import failed")
+            logging.warning(
+                f"Name '{app}' intersects with a Python module, try a new one"
+            )
+            flag = True
+
+    sys.path.insert(0, cwd)
+    return flag
 
 
 def parse_versions() -> dict:
@@ -73,6 +102,7 @@ def write_update(versions: dict, app: str) -> None:
 
 
 def get_version(app: str) -> str:
+    test_app_names()
     versions = parse_versions()
     return versions.get(app, "0.0.0")
 

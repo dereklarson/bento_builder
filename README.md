@@ -20,6 +20,9 @@ to get the most out of this repository.
 ##### Clone this repo:
 `git clone https://github.com/dereklarson/bento_builder.git`
 
+##### Install Python requirements (for using the build.py script):
+`pip install -r requirements.txt`
+
 ##### Try locally serving the simple example dashboard:
 `./build.py simple_example -x` (using the -x "execute" flag)
 
@@ -34,7 +37,7 @@ a bug is dependent on the Docker environment.
 In this case the dataset is included in the build (it's small), so you could now
 use this image in a deployment.
 
-##### Test editing with hot-reload, it's recommended to use Docker: 
+##### Test editing with hot-reload, via a Docker container: 
 `./build.py simple_example -dbu` (includes the -d "dev" flag)
 
 This adds in the dev-docker-compose.yaml specs, which mounts the project directory
