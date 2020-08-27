@@ -8,7 +8,7 @@ stock_page = {
         # Supply args to the bank to control its behavior and appearance
         # In this case, we're indicating the filter dropdowns should stack vertically
         "filters": {
-            "type": "filter_set",
+            "type": "selector",
             "args": {"columns": ["symbol"], "vertical": True},
         },
         "axes": {"type": "axis_controls", "args": {"use": "y", "default": "open"},},
